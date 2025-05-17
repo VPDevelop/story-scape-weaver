@@ -3,16 +3,17 @@ import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Story {
   id: string;
   title: string;
-  childName: string;
-  theme: string;
-  language: string;
-  coverImage: string;
-  text: string;
-  audioUrl?: string;
+  lang: string;
+  text: string | null;
+  image_url: string | null;
+  audio_url: string | null;
+  created_at: string;
 }
 
 const StoryReader = () => {
@@ -22,17 +23,39 @@ const StoryReader = () => {
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const { toast } = useToast();
   
   useEffect(() => {
-    const savedStories = JSON.parse(localStorage.getItem("stories") || "[]");
-    const foundStory = savedStories.find((s: Story) => s.id === id);
+    const fetchStory = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('stories')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error) {
+          throw error;
+        }
+        
+        setStory(data);
+      } catch (error) {
+        console.error('Error fetching story:', error);
+        toast({
+          title: "Error loading story",
+          description: "The story could not be found or you don't have permission to view it.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    if (foundStory) {
-      setStory(foundStory);
-    }
-    
-    setLoading(false);
-  }, [id]);
+    fetchStory();
+  }, [id, toast]);
   
   const handlePlayPause = () => {
     if (!audioRef.current) return;
@@ -53,7 +76,7 @@ const StoryReader = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-pulse bg-muted h-4 w-24 rounded"></div>
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -67,14 +90,12 @@ const StoryReader = () => {
     );
   }
   
-  // Generate a very basic placeholder text for the story
-  const storyText = story.text || `Once upon a time, ${story.childName} went on an amazing ${story.theme} adventure...
+  // Generate a placeholder text if the story text is empty
+  const storyText = story.text || `Once upon a time, in a world of wonder and magic, an incredible adventure began.
 
-In a world full of wonder and magic, ${story.childName} discovered the true meaning of courage and friendship.
+This is a placeholder for your story. The real content will appear when you add text to your stories.
 
-As the journey continued, challenges appeared, but ${story.childName} faced them with determination and a kind heart.
-
-At the end of this wonderful ${story.theme} adventure, ${story.childName} returned home with new wisdom and memories to cherish forever.
+As our hero faced challenges and made new friends, valuable lessons were learned about courage, kindness, and perseverance.
 
 THE END`;
   
@@ -93,7 +114,7 @@ THE END`;
       {/* Full-width image */}
       <div className="w-full h-[40vh] md:h-[50vh]">
         <img 
-          src={story.coverImage} 
+          src={story.image_url || `https://source.unsplash.com/random/1200x800/?${encodeURIComponent(story.title)}`} 
           alt={story.title} 
           className="w-full h-full object-cover"
         />
@@ -120,18 +141,18 @@ THE END`;
             onClick={handlePlayPause} 
             variant="ghost" 
             size="sm" 
-            disabled={!story.audioUrl}
+            disabled={!story.audio_url}
             className="rounded-full"
           >
             {isPlaying ? 'Pause' : 'Play'} 
           </Button>
           <div className="text-sm text-muted-foreground">
-            {!story.audioUrl ? 'No audio available' : (isPlaying ? 'Playing...' : 'Click to play')}
+            {!story.audio_url ? 'No audio available' : (isPlaying ? 'Playing...' : 'Click to play')}
           </div>
-          {story.audioUrl && (
+          {story.audio_url && (
             <audio 
               ref={audioRef} 
-              src={story.audioUrl} 
+              src={story.audio_url} 
               onEnded={() => setIsPlaying(false)}
               controls={false}
             />

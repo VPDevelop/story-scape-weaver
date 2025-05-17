@@ -30,6 +30,7 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
@@ -42,6 +43,7 @@ type FormValues = z.infer<typeof formSchema>;
 const NewStory = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -52,31 +54,58 @@ const NewStory = () => {
     },
   });
   
-  const onSubmit = (data: FormValues) => {
-    // In a real app, we'd send this to an API
-    const storyId = Date.now().toString();
-    const story = {
-      id: storyId,
-      childName: data.childName,
-      theme: data.theme,
-      language: data.language,
-      title: `${data.childName}'s ${data.theme} Adventure`,
-      created: new Date().toISOString(),
-      coverImage: `https://images.unsplash.com/photo-1523712999610-f77fbcfc3843?w=500&q=80`,
-      text: `Once upon a time, ${data.childName} went on an amazing ${data.theme} adventure...`,
-      audioUrl: "",
-    };
-    
-    // Save to local storage
-    const savedStories = JSON.parse(localStorage.getItem("stories") || "[]");
-    localStorage.setItem("stories", JSON.stringify([...savedStories, story]));
-    
-    toast({
-      title: "Story Created!",
-      description: `${story.title} has been added to your library.`,
-    });
-    
-    navigate(`/story/${storyId}`);
+  const onSubmit = async (data: FormValues) => {
+    try {
+      setIsSubmitting(true);
+      
+      // Check if user is authenticated
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to create a story.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const storyTitle = `${data.childName}'s ${data.theme} Adventure`;
+      const storyText = `Once upon a time, ${data.childName} went on an amazing ${data.theme} adventure...`;
+      const imageUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(data.theme)}`;
+      
+      const { data: storyData, error } = await supabase
+        .from('stories')
+        .insert([
+          {
+            title: storyTitle,
+            text: storyText,
+            lang: data.language,
+            image_url: imageUrl,
+          }
+        ])
+        .select()
+        .single();
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Story Created!",
+        description: `${storyTitle} has been added to your library.`,
+      });
+      
+      navigate(`/story/${storyData.id}`);
+    } catch (error) {
+      console.error('Error creating story:', error);
+      toast({
+        title: "Error creating story",
+        description: "Please try again or check if you're logged in.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const themes = [
@@ -180,8 +209,8 @@ const NewStory = () => {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full mt-6">
-                Create Story
+              <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>
+                {isSubmitting ? 'Creating...' : 'Create Story'}
               </Button>
             </form>
           </Form>

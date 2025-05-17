@@ -1,35 +1,54 @@
 
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Layout from "./components/Layout";
-import NewStory from "./pages/NewStory";
-import Library from "./pages/Library";
-import StoryReader from "./pages/StoryReader";
-import NotFound from "./pages/NotFound";
+import Layout from "@/components/Layout";
+import Index from "@/pages/Index";
+import Library from "@/pages/Library";
+import NewStory from "@/pages/NewStory";
+import StoryReader from "@/pages/StoryReader";
+import NotFound from "@/pages/NotFound";
+import Auth from "@/pages/Auth";
+import { supabase } from "@/integrations/supabase/client";
 
-const queryClient = new QueryClient();
+export default function App() {
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Navigate to="/library" replace />} />
-            <Route path="new" element={<NewStory />} />
-            <Route path="library" element={<Library />} />
-            <Route path="story/:id" element={<StoryReader />} />
+  useEffect(() => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="lunatales-theme">
+      <Router>
+        <Layout session={session} loading={loading}>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/library" element={<Library />} />
+            <Route path="/new" element={<NewStory />} />
+            <Route path="/story/:id" element={<StoryReader />} />
+            <Route path="/auth" element={<Auth />} />
             <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
+          </Routes>
+        </Layout>
+      </Router>
+      <Toaster />
+    </ThemeProvider>
+  );
+}

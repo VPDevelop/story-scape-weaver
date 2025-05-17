@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -88,11 +89,11 @@ const NewStory = () => {
       
       toast({
         title: "Story Created!",
-        description: A personalized story has been created for ${data.childName}.,
+        description: `A personalized story has been created for ${data.childName}.`,
       });
       
       // Navigate to the story page
-      navigate(/story/${storyData.id});
+      navigate(`/story/${storyData.id}`);
     } catch (error) {
       console.error('Error creating story:', error);
       toast({

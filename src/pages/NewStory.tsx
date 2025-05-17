@@ -35,7 +35,7 @@ import { supabase } from "@/integrations/supabase/client";
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
   theme: z.string().min(1, "Theme is required"),
-  language: z.string().min(1, "Language is required"),
+  lang: z.string().min(1, "Language is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -50,7 +50,7 @@ const NewStory = () => {
     defaultValues: {
       childName: "",
       theme: "",
-      language: "en",
+      lang: "en",
     },
   });
   
@@ -78,7 +78,7 @@ const NewStory = () => {
         body: { 
           childName: data.childName, 
           theme: data.theme, 
-          lang: data.language, 
+          lang: data.lang, 
           userId 
         }
       });
@@ -186,7 +186,7 @@ const NewStory = () => {
                   
                   <FormField
                     control={form.control}
-                    name="language"
+                    name="lang"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Language</FormLabel>

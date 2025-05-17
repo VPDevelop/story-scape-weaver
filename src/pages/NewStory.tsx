@@ -66,6 +66,7 @@ const NewStory = () => {
           description: "Please sign in to create a story.",
           variant: "destructive",
         });
+        navigate("/auth");
         return;
       }
       
@@ -75,14 +76,13 @@ const NewStory = () => {
       
       const { data: storyData, error } = await supabase
         .from('stories')
-        .insert([
-          {
-            title: storyTitle,
-            text: storyText,
-            lang: data.language,
-            image_url: imageUrl,
-          }
-        ])
+        .insert({
+          title: storyTitle,
+          text: storyText,
+          lang: data.language,
+          image_url: imageUrl,
+          user_id: sessionData.session.user.id // Add the user_id from the session
+        })
         .select()
         .single();
       

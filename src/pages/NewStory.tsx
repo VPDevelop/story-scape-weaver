@@ -50,7 +50,7 @@ const NewStory = () => {
     defaultValues: {
       childName: "",
       theme: "",
-      language: "English",
+      language: "en",
     },
   });
   
@@ -70,21 +70,18 @@ const NewStory = () => {
         return;
       }
       
-      const storyTitle = `${data.childName}'s ${data.theme} Adventure`;
-      const storyText = `Once upon a time, ${data.childName} went on an amazing ${data.theme} adventure...`;
-      const imageUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(data.theme)}`;
+      // Get user ID
+      const userId = sessionData.session.user.id;
       
-      const { data: storyData, error } = await supabase
-        .from('stories')
-        .insert({
-          title: storyTitle,
-          text: storyText,
-          lang: data.language,
-          image_url: imageUrl,
-          user_id: sessionData.session.user.id // Add the user_id from the session
-        })
-        .select()
-        .single();
+      // Call the generateStory edge function
+      const { data: storyData, error } = await supabase.functions.invoke('generateStory', {
+        body: { 
+          childName: data.childName, 
+          theme: data.theme, 
+          lang: data.language, 
+          userId 
+        }
+      });
       
       if (error) {
         throw error;
@@ -92,9 +89,10 @@ const NewStory = () => {
       
       toast({
         title: "Story Created!",
-        description: `${storyTitle} has been added to your library.`,
+        description: `A personalized story has been created for ${data.childName}.`,
       });
       
+      // Navigate to the story page
       navigate(`/story/${storyData.id}`);
     } catch (error) {
       console.error('Error creating story:', error);
@@ -119,7 +117,14 @@ const NewStory = () => {
     "Superheroes",
   ];
   
-  const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese"];
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "es", name: "Spanish" },
+    { code: "fr", name: "French" },
+    { code: "de", name: "German" },
+    { code: "zh", name: "Chinese" },
+    { code: "ja", name: "Japanese" },
+  ];
   
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -196,8 +201,8 @@ const NewStory = () => {
                           </FormControl>
                           <SelectContent>
                             {languages.map((language) => (
-                              <SelectItem key={language} value={language}>
-                                {language}
+                              <SelectItem key={language.code} value={language.code}>
+                                {language.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -210,7 +215,7 @@ const NewStory = () => {
               </div>
               
               <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create Story'}
+                {isSubmitting ? 'Creating...' : 'Generate Story'}
               </Button>
             </form>
           </Form>

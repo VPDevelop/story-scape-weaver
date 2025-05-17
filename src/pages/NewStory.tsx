@@ -31,7 +31,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { supabase } from "@/integrations/supabase/client";
-console.log("Supabase client (module scope):", supabase);
 
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
@@ -56,6 +55,7 @@ const NewStory = () => {
   });
   
   const onSubmit = async (data: FormValues) => {
+    console.log("Supabase in onSubmit:", supabase);
     try {
       setIsSubmitting(true);
       

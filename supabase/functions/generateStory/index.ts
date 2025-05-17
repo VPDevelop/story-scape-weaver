@@ -45,8 +45,8 @@ serve(async (req) => {
       storyText += `It was the most exciting day of ${childName}'s life, filled with wonder and joy.`;
     }
 
-    // Generate a placeholder image URL (in a real app, you might use an image generation API)
-    const imageUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(theme)}`;
+    // Initially using a placeholder URL - will be updated by the image generation function
+    const placeholderImageUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(theme)}`;
 
     // Save the story to the database
     const { data, error } = await supabase
@@ -55,7 +55,7 @@ serve(async (req) => {
         title: storyTitle,
         text: storyText,
         lang: lang,
-        image_url: imageUrl,
+        image_url: placeholderImageUrl,
         user_id: userId
       })
       .select()
@@ -64,6 +64,22 @@ serve(async (req) => {
     if (error) {
       throw error;
     }
+
+    // Trigger image generation in the background
+    const imagePrompt = `A child-friendly, colorful illustration for a children's story about ${childName} having an adventure in a ${theme} setting. The image should be appropriate for children, bright, engaging, and illustrative of the theme.`;
+    
+    // Call the generateImage function asynchronously
+    fetch(`${supabaseUrl}/functions/v1/generateImage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseServiceKey}`
+      },
+      body: JSON.stringify({
+        storyId: data.id,
+        prompt: imagePrompt
+      })
+    }).catch(err => console.error("Error triggering image generation:", err));
 
     return new Response(
       JSON.stringify(data),

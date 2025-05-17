@@ -22,6 +22,7 @@ const StoryReader = () => {
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   
@@ -55,6 +56,24 @@ const StoryReader = () => {
     };
     
     fetchStory();
+
+    // Set up a subscription to listen for changes to the story
+    const channel = supabase
+      .channel(`story_${id}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'stories',
+        filter: `id=eq.${id}`,
+      }, (payload) => {
+        console.log('Story updated:', payload);
+        setStory(payload.new as Story);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [id, toast]);
   
   const handlePlayPause = () => {
@@ -71,6 +90,19 @@ const StoryReader = () => {
   
   const handleBack = () => {
     navigate('/library');
+  };
+
+  const handleImageLoad = () => {
+    setImageLoading(false);
+  };
+
+  const handleImageError = () => {
+    setImageLoading(false);
+    toast({
+      title: "Image failed to load",
+      description: "The story image could not be loaded.",
+      variant: "destructive",
+    });
   };
   
   if (loading) {
@@ -112,11 +144,18 @@ THE END`;
       </Button>
       
       {/* Full-width image */}
-      <div className="w-full h-[40vh] md:h-[50vh]">
+      <div className="w-full h-[40vh] md:h-[50vh] relative">
+        {imageLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-muted/20">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
         <img 
           src={story.image_url || `https://source.unsplash.com/random/1200x800/?${encodeURIComponent(story.title)}`} 
           alt={story.title} 
           className="w-full h-full object-cover"
+          onLoad={handleImageLoad}
+          onError={handleImageError}
         />
       </div>
       

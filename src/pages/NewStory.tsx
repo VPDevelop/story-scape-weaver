@@ -55,7 +55,7 @@ const NewStory = () => {
   });
   
   const onSubmit = async (data: FormValues) => {
-    console.log("Supabase in onSubmit:", supabase);
+    console.log("Form submitted:", data);
     try {
       setIsSubmitting(true);
       
@@ -73,6 +73,7 @@ const NewStory = () => {
       
       // Get user ID
       const userId = sessionData.session.user.id;
+      console.log("User ID:", userId);
       
       // Call the generateStory edge function
       const { data: storyData, error } = await supabase.functions.invoke('generateStory', {
@@ -85,8 +86,11 @@ const NewStory = () => {
       });
       
       if (error) {
+        console.error("Error from edge function:", error);
         throw error;
       }
+      
+      console.log("Story created:", storyData);
       
       toast({
         title: "Story Created!",

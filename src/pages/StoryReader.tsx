@@ -22,7 +22,7 @@ const StoryReader = () => {
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [imageLoading, setImageLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   

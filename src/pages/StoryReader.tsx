@@ -79,7 +79,7 @@ At the end of this wonderful ${story.theme} adventure, ${story.childName} return
 THE END`;
   
   return (
-    <div className="max-h-screen overflow-y-auto pb-16 -mt-4 -mx-4">
+    <div className="-mt-4 -mx-4 pb-20 overflow-hidden">
       {/* Back button */}
       <Button 
         variant="outline" 
@@ -90,27 +90,26 @@ THE END`;
         <ArrowLeft className="h-4 w-4" />
       </Button>
       
-      {/* Main story content */}
-      <div className="relative">
-        <div className="h-[40vh] md:h-[50vh] relative">
-          <img 
-            src={story.coverImage} 
-            alt={story.title} 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background flex items-end">
-            <div className="p-4 w-full">
-              <h1 className="text-3xl md:text-4xl font-bold">{story.title}</h1>
-            </div>
-          </div>
-        </div>
-        
-        <div className="p-6 md:p-8 max-w-3xl mx-auto">
-          <div className="prose prose-lg prose-stone dark:prose-invert mx-auto">
-            {storyText.split('\n\n').map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
-          </div>
+      {/* Full-width image */}
+      <div className="w-full h-[40vh] md:h-[50vh]">
+        <img 
+          src={story.coverImage} 
+          alt={story.title} 
+          className="w-full h-full object-cover"
+        />
+      </div>
+      
+      {/* Title */}
+      <div className="px-6 pt-6 pb-2">
+        <h1 className="text-3xl md:text-4xl font-bold">{story.title}</h1>
+      </div>
+      
+      {/* Story text in serif font */}
+      <div className="px-6 py-6 max-w-3xl mx-auto">
+        <div className="prose prose-lg prose-stone dark:prose-invert mx-auto font-serif">
+          {storyText.split('\n\n').map((paragraph, index) => (
+            <p key={index} className="mb-6 text-xl leading-relaxed">{paragraph}</p>
+          ))}
         </div>
       </div>
       
@@ -134,7 +133,7 @@ THE END`;
               ref={audioRef} 
               src={story.audioUrl} 
               onEnded={() => setIsPlaying(false)}
-              className="hidden"
+              controls={false}
             />
           )}
         </div>

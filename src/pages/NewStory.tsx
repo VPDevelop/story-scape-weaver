@@ -93,7 +93,7 @@ const NewStory = () => {
   const languages = ["English", "Spanish", "French", "German", "Chinese", "Japanese"];
   
   return (
-    <div className="max-w-md mx-auto py-8">
+    <div className="max-w-4xl mx-auto py-8">
       <Card className="shadow-md border-2 border-story-purple/20">
         <CardHeader className="bg-story-purple/10 rounded-t-lg">
           <CardTitle className="text-2xl text-center text-primary">Create a New Story</CardTitle>
@@ -104,77 +104,83 @@ const NewStory = () => {
         <CardContent className="pt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="childName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Child's Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter child's name" {...field} className="rounded-lg" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="childName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Child's Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter child's name" {...field} className="rounded-lg" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="space-y-6">
+                  <FormField
+                    control={form.control}
+                    name="theme"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Story Theme</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="rounded-lg">
+                              <SelectValue placeholder="Select a theme" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {themes.map((theme) => (
+                              <SelectItem key={theme} value={theme}>
+                                {theme}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="language"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Language</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="rounded-lg">
+                              <SelectValue placeholder="Select a language" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {languages.map((language) => (
+                              <SelectItem key={language} value={language}>
+                                {language}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
               
-              <FormField
-                control={form.control}
-                name="theme"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Story Theme</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="rounded-lg">
-                          <SelectValue placeholder="Select a theme" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {themes.map((theme) => (
-                          <SelectItem key={theme} value={theme}>
-                            {theme}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="language"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Language</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="rounded-lg">
-                          <SelectValue placeholder="Select a language" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {languages.map((language) => (
-                          <SelectItem key={language} value={language}>
-                            {language}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full mt-6">
                 Create Story
               </Button>
             </form>

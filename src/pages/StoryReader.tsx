@@ -47,8 +47,8 @@ const StoryReader = () => {
   
   return (
     <div className="-mt-4 -mx-4 pb-20 overflow-hidden">
-      {/* Fixed action buttons container - improved positioning and z-index */}
-      <div className="fixed top-4 left-0 right-0 z-20 px-4 flex justify-between max-w-screen-lg mx-auto">
+      {/* Action buttons container - positioned below header but above image */}
+      <div className="sticky top-16 pt-4 pb-2 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
         {/* Back button with enhanced visibility */}
         <Button 
           variant="outline" 

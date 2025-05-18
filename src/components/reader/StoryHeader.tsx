@@ -1,8 +1,4 @@
 
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-
 interface StoryHeaderProps {
   title: string;
   imageUrl: string | null;
@@ -18,24 +14,8 @@ const StoryHeader = ({
   onImageError, 
   imageLoading 
 }: StoryHeaderProps) => {
-  const navigate = useNavigate();
-  
-  const handleBack = () => {
-    navigate('/library');
-  };
-
   return (
     <>
-      {/* Back button */}
-      <Button 
-        variant="outline" 
-        size="icon" 
-        onClick={handleBack}
-        className="fixed top-4 left-4 z-10 md:top-20 rounded-full bg-background/80 backdrop-blur-sm"
-      >
-        <ArrowLeft className="h-4 w-4" />
-      </Button>
-      
       {/* Full-width image */}
       <div className="w-full h-[40vh] md:h-[50vh] relative">
         {imageLoading && (

@@ -47,18 +47,21 @@ const StoryReader = () => {
   
   return (
     <div className="-mt-4 -mx-4 pb-20 overflow-hidden">
-      {/* Back button */}
-      <Button 
-        variant="outline" 
-        size="icon" 
-        onClick={handleBack}
-        className="fixed top-4 left-4 z-10 md:top-20 rounded-full bg-background/80 backdrop-blur-sm"
-      >
-        <ArrowLeft className="h-4 w-4" />
-      </Button>
-      
-      {/* Delete button */}
-      <DeleteStoryDialog storyId={story.id} storyTitle={story.title} />
+      {/* Fixed action buttons container */}
+      <div className="fixed top-4 left-0 right-0 z-10 md:top-20 px-4 flex justify-between">
+        {/* Back button */}
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={handleBack}
+          className="rounded-full bg-background/80 backdrop-blur-sm"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        
+        {/* Delete button - using the DialogTrigger from DeleteStoryDialog */}
+        <DeleteStoryDialog storyId={story.id} storyTitle={story.title} />
+      </div>
       
       <StoryHeader
         title={story.title}

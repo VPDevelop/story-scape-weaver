@@ -60,7 +60,11 @@ const DeleteStoryDialog = ({ storyId, storyTitle }: DeleteStoryDialogProps) => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur-sm hover:bg-destructive/10 hover:text-destructive">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-destructive/10 hover:text-destructive"
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       </AlertDialogTrigger>

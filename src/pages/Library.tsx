@@ -62,7 +62,7 @@ const Library = () => {
   if (stories.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] text-center">
-        <div className="mb-6 p-6 bg-primary/20 rounded-full">
+        <div className="mb-6 p-6 bg-story-lightPurple/20 rounded-full">
           <BookOpen className="h-16 w-16 text-primary" />
         </div>
         <h2 className="text-2xl font-bold mb-2">Your library is empty</h2>
@@ -79,7 +79,7 @@ const Library = () => {
   return (
     <div className="py-6">
       <h1 className="text-3xl font-bold mb-6 text-center md:text-left">Your Story Library</h1>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {stories.map((story) => (
           <Link to={`/story/${story.id}`} key={story.id}>
             <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 border-2 border-transparent hover:border-primary/20">
@@ -93,7 +93,7 @@ const Library = () => {
                   <h3 className="text-white font-bold text-lg line-clamp-2">{story.title}</h3>
                 </div>
               </div>
-              <CardFooter className="p-2 bg-surface flex justify-between items-center">
+              <CardFooter className="p-2 bg-background flex justify-between items-center">
                 <div className="text-xs text-muted-foreground">
                   {new Date(story.created_at).toLocaleDateString()}
                 </div>

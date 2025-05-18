@@ -1,11 +1,11 @@
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut } from "lucide-react";
+import UserMenu from "@/components/UserMenu";
 
 interface LayoutProps {
   children: ReactNode;
@@ -16,24 +16,15 @@ interface LayoutProps {
 const Layout = ({ children, session, loading }: LayoutProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Signed out successfully",
-        duration: 3000,
-      });
-      navigate("/");
-    } catch (error) {
-      console.error("Error signing out:", error);
-      toast({
-        title: "Error signing out",
-        variant: "destructive",
-        duration: 3000,
-      });
+  useEffect(() => {
+    if (session?.user?.email) {
+      setUserEmail(session.user.email);
+    } else {
+      setUserEmail(null);
     }
-  };
+  }, [session]);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -51,19 +42,16 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
           <div className="flex items-center gap-4">
             <Navbar />
             
-            {!loading && session && (
-              <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
-            )}
-            
-            {!loading && !session && (
-              <Link to="/auth">
-                <Button size="sm">
-                  Sign In
-                </Button>
-              </Link>
+            {!loading && session ? (
+              <UserMenu userEmail={userEmail} />
+            ) : (
+              !loading && (
+                <Link to="/auth">
+                  <Button size="sm">
+                    Sign In
+                  </Button>
+                </Link>
+              )
             )}
           </div>
         </div>

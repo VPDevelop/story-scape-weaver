@@ -10,6 +10,7 @@ import NewStory from "@/pages/NewStory";
 import StoryReader from "@/pages/StoryReader";
 import NotFound from "@/pages/NotFound";
 import Auth from "@/pages/Auth";
+import Account from "@/pages/Account";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
             <Route path="/new" element={<NewStory />} />
             <Route path="/story/:id" element={<StoryReader />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/account" element={<Account />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

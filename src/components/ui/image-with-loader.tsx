@@ -31,9 +31,10 @@ export function ImageWithLoader({
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
   const maxRetries = 3;
-  const retryDelay = 1500;
+  const retryDelay = 3000; // Increase retry delay to 3 seconds
 
   useEffect(() => {
+    // Reset states when src changes
     setImgSrc(src);
     setIsLoading(true);
     setHasError(false);
@@ -52,14 +53,27 @@ export function ImageWithLoader({
   };
 
   const handleError = () => {
+    // Clear any existing timeout
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+    
     if (retryCount < maxRetries) {
       setRetryCount(prev => prev + 1);
       
+      // Set a new timeout for retry
       retryTimeoutRef.current = setTimeout(() => {
-        // Add a cache-busting query param to force a fresh request
-        setImgSrc(`${src}${src.includes('?') ? '&' : '?'}retry=${Date.now()}`);
+        // Add a cache-busting query param with timestamp to force a fresh request
+        const cacheBuster = `retry=${Date.now()}`;
+        const newSrc = src.includes('?') 
+          ? `${src}&${cacheBuster}` 
+          : `${src}?${cacheBuster}`;
+        
+        setImgSrc(newSrc);
       }, retryDelay);
     } else {
+      // Stop loading and show error state after max retries
       setIsLoading(false);
       setHasError(true);
       toast({
@@ -71,10 +85,18 @@ export function ImageWithLoader({
   };
 
   const handleRetryClick = () => {
+    // Reset states for manual retry
     setIsLoading(true);
     setHasError(false);
     setRetryCount(0);
-    setImgSrc(`${src}${src.includes('?') ? '&' : '?'}retry=${Date.now()}`);
+    
+    // Add a cache-busting query param with timestamp
+    const cacheBuster = `retry=${Date.now()}`;
+    const newSrc = src.includes('?') 
+      ? `${src}&${cacheBuster}` 
+      : `${src}?${cacheBuster}`;
+    
+    setImgSrc(newSrc);
   };
 
   return (

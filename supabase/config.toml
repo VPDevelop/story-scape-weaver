@@ -1,7 +1,8 @@
 
-drfufywfplvjrpmqfqlz
-[global]
-[auth]
-[auth.email]
-[functions]
-[storage]
+project_id = "drfufywfplvjrpmqfqlz"
+
+[functions.generateImage]
+
+[functions.generateStory]
+
+[functions.generateAudio]

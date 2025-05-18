@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Music, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,6 +23,7 @@ const StoryReader = () => {
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
+  const [audioGenerating, setAudioGenerating] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
   
@@ -104,6 +105,48 @@ const StoryReader = () => {
       variant: "destructive",
     });
   };
+
+  const generateAudio = async () => {
+    if (!id || !story) return;
+
+    try {
+      setAudioGenerating(true);
+      
+      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/generateAudio`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.supabaseKey}`
+        },
+        body: JSON.stringify({
+          storyId: id
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate audio');
+      }
+
+      const data = await response.json();
+      
+      toast({
+        title: "Audio generated successfully",
+        description: "Your story now has audio narration.",
+      });
+
+      // The story state will be updated via the realtime subscription
+    } catch (error) {
+      console.error('Error generating audio:', error);
+      toast({
+        title: "Error generating audio",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setAudioGenerating(false);
+    }
+  };
   
   if (loading) {
     return (
@@ -176,25 +219,46 @@ THE END`;
       {/* Audio player */}
       <div className="fixed bottom-16 md:bottom-4 left-0 right-0 p-4 flex justify-center z-10">
         <div className="bg-card shadow-lg rounded-full px-4 py-2 flex items-center gap-3 border">
-          <Button 
-            onClick={handlePlayPause} 
-            variant="ghost" 
-            size="sm" 
-            disabled={!story.audio_url}
-            className="rounded-full"
-          >
-            {isPlaying ? 'Pause' : 'Play'} 
-          </Button>
-          <div className="text-sm text-muted-foreground">
-            {!story.audio_url ? 'No audio available' : (isPlaying ? 'Playing...' : 'Click to play')}
-          </div>
+          {!story.audio_url && !audioGenerating && (
+            <Button 
+              onClick={generateAudio} 
+              variant="ghost" 
+              size="sm" 
+              className="rounded-full flex items-center gap-1"
+            >
+              <Music className="h-4 w-4 mr-1" />
+              Generate Audio
+            </Button>
+          )}
+          
+          {audioGenerating && (
+            <div className="flex items-center gap-2 px-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-sm">Generating audio...</span>
+            </div>
+          )}
+          
           {story.audio_url && (
-            <audio 
-              ref={audioRef} 
-              src={story.audio_url} 
-              onEnded={() => setIsPlaying(false)}
-              controls={false}
-            />
+            <>
+              <Button 
+                onClick={handlePlayPause} 
+                variant="ghost" 
+                size="sm" 
+                disabled={!story.audio_url}
+                className="rounded-full"
+              >
+                {isPlaying ? 'Pause' : 'Play'} 
+              </Button>
+              <div className="text-sm text-muted-foreground">
+                {!story.audio_url ? 'No audio available' : (isPlaying ? 'Playing...' : 'Click to play')}
+              </div>
+              <audio 
+                ref={audioRef} 
+                src={story.audio_url} 
+                onEnded={() => setIsPlaying(false)}
+                controls={false}
+              />
+            </>
           )}
         </div>
       </div>

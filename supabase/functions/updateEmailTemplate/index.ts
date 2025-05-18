@@ -17,22 +17,15 @@ const handler = async (_req: Request): Promise<Response> => {
     // Get environment variables
     const serviceRoleKey = Deno.env.get("SERVICE_ROLE_KEY") || 
                           Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    const projectRef = 
-      Deno.env.get("PROJECT_ID") || 
-      Deno.env.get("SUPABASE_PROJECT_REF") || 
-      Deno.env.get("PROJECT_REF") || 
-      Deno.env.get("SUPABASE_PROJECT_ID");
+    
+    // Hardcode the project ID since we know it from the client configuration
+    const projectRef = "drfufywfplvjrpmqfqlz";
     
     console.log("Service role key exists:", !!serviceRoleKey);
-    console.log("Project ref exists:", !!projectRef);
-    console.log("Project ref:", projectRef);
+    console.log("Using hardcoded project ref:", projectRef);
     
     if (!serviceRoleKey) {
       throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY or SERVICE_ROLE_KEY");
-    }
-    
-    if (!projectRef) {
-      throw new Error("Missing project reference (PROJECT_ID, PROJECT_REF, etc.)");
     }
 
     const htmlContent = `

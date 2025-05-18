@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -21,7 +20,7 @@ interface Story {
 const Library = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshKey, setRefreshKey] = useState(Date.now()); // Add a refresh key state
+  const [refreshKey, setRefreshKey] = useState(Date.now());
   const { toast } = useToast();
   const location = useLocation();
   
@@ -67,15 +66,19 @@ const Library = () => {
         schema: 'public',
         table: 'stories',
       }, (payload) => {
-        console.log('Story deleted:', payload);
+        console.log('Story deletion detected:', payload);
+        // Update the stories state by filtering out the deleted story
         setStories(prev => prev.filter(story => story.id !== payload.old.id));
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
       
     return () => {
+      console.log('Cleaning up realtime subscription');
       supabase.removeChannel(channel);
     };
-  }, [fetchStories, location.key]); // Re-fetch when navigation occurs
+  }, [fetchStories]);
   
   if (loading) {
     return (
@@ -107,7 +110,7 @@ const Library = () => {
       <h1 className="text-3xl font-bold mb-6 text-center md:text-left">Your Story Library</h1>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {stories.map((story) => (
-          <Link to={`/story/${story.id}`} key={story.id}>
+          <Link to={`/story/${story.id}`} key={`story-card-${story.id}-${refreshKey}`}>
             <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 border-2 border-transparent hover:border-primary/20">
               <div className="aspect-[3/4] relative overflow-hidden">
                 <ImageWithLoader
@@ -116,7 +119,7 @@ const Library = () => {
                   aspectRatio={3/4}
                   className="w-full h-full"
                   imgClassName="w-full h-full object-cover"
-                  key={`story-${story.id}-${refreshKey}`} // Use the refreshKey to force re-render
+                  key={`story-img-${story.id}-${refreshKey}`} 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
                   <h3 className="text-white font-bold text-lg line-clamp-2">{story.title}</h3>

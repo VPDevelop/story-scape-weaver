@@ -1,7 +1,6 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 import { useStory } from "@/hooks/useStory";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -15,9 +14,8 @@ import DeleteStoryDialog from "@/components/reader/DeleteStoryDialog";
 const StoryReader = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { story, loading } = useStory(id);
-  const [refreshKey] = useState(Date.now()); // Add a refresh key that doesn't change
+  const [refreshKey] = useState(Date.now());
   
   const handleBack = () => {
     navigate('/library');
@@ -33,8 +31,8 @@ const StoryReader = () => {
   
   return (
     <div className="-mt-4 -mx-4 pb-16 overflow-hidden">
-      {/* Action buttons container - positioned with reduced padding */}
-      <div className="sticky top-16 pt-1 pb-0 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
+      {/* Action buttons container with reduced padding */}
+      <div className="sticky top-14 pt-1 pb-0 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
         {/* Back button with enhanced visibility */}
         <Button 
           variant="outline" 
@@ -55,7 +53,7 @@ const StoryReader = () => {
         onImageLoad={() => {}}
         onImageError={() => {}}
         imageLoading={false}
-        key={`story-header-${story.id}-${refreshKey}`} // Add a key to force render
+        key={`story-header-${story.id}-${refreshKey}`}
       />
       
       <StoryContent text={story.text} />

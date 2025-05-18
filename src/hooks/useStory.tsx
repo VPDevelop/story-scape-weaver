@@ -61,9 +61,21 @@ export const useStory = (id: string | undefined) => {
         console.log('Story updated:', payload);
         setStory(payload.new as Story);
       })
-      .subscribe();
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'stories',
+        filter: `id=eq.${id}`,
+      }, (payload) => {
+        console.log('Story deleted:', payload);
+        setStory(null);
+      })
+      .subscribe((status) => {
+        console.log(`Story subscription status for ${id}:`, status);
+      });
 
     return () => {
+      console.log(`Removing channel for story ${id}`);
       supabase.removeChannel(channel);
     };
   }, [id, toast]);

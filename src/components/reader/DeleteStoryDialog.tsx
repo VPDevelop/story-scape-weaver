@@ -30,6 +30,7 @@ const DeleteStoryDialog = ({ storyId, storyTitle }: DeleteStoryDialogProps) => {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
+      
       const { error } = await supabase
         .from('stories')
         .delete()

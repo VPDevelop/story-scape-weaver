@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -27,6 +28,8 @@ const Library = () => {
   // Update refresh key when navigation occurs
   useEffect(() => {
     setRefreshKey(Date.now());
+    // Force a refetch when returning to the library
+    fetchStories();
   }, [location.key]);
   
   const fetchStories = useCallback(async () => {

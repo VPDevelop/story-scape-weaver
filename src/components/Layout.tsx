@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -22,6 +22,7 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
       await supabase.auth.signOut();
       toast({
         title: "Signed out successfully",
+        duration: 3000,
       });
       navigate("/");
     } catch (error) {
@@ -29,6 +30,7 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
       toast({
         title: "Error signing out",
         variant: "destructive",
+        duration: 3000,
       });
     }
   };
@@ -49,27 +51,19 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
           <div className="flex items-center gap-4">
             <Navbar />
             
-            {!loading && (
-              session ? (
-                <div className="flex items-center gap-2">
-                  <Link to="/library">
-                    <Button variant="outline" size="sm">
-                      <User className="h-4 w-4 mr-2" />
-                      My Stories
-                    </Button>
-                  </Link>
-                  <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
-                <Link to="/auth">
-                  <Button size="sm">
-                    Sign In
-                  </Button>
-                </Link>
-              )
+            {!loading && session && (
+              <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            )}
+            
+            {!loading && !session && (
+              <Link to="/auth">
+                <Button size="sm">
+                  Sign In
+                </Button>
+              </Link>
             )}
           </div>
         </div>

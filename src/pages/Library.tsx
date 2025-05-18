@@ -42,6 +42,7 @@ const Library = () => {
           title: "Error loading stories",
           description: "Please try again later or verify you're logged in.",
           variant: "destructive",
+          duration: 3000,
         });
       } finally {
         setLoading(false);

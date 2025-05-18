@@ -51,26 +51,34 @@
     --accent-hover: 260 80% 80%;
     --accent-active: 260 80% 70%;
     --focus-ring: rgba(155, 135, 245, 0.4);
+    --divider: 214.3 31.8% 91.4%;
+    --bg-surface-2: 0 0% 98%;
+    --text-secondary: 215.4 16.3% 46.9%;
+    --shadow: rgba(0, 0, 0, 0.1);
   }
 
   .dark {
-    --background: 222.2 20% 12%;
+    --background: 222 18% 11%;
     --foreground: 210 40% 98%;
 
-    --card: 220 20% 15%;
+    --bg-main: 220 10% 11%;
+    --bg-surface: 222 12% 15%;
+    --bg-surface-2: 220 12% 18%;
+
+    --card: var(--bg-surface);
     --card-foreground: 210 40% 98%;
 
-    --popover: 220 20% 10%;
+    --popover: 220 12% 10%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 260 60% 65%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 20% 25%;
+    --secondary: 220 12% 25%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 220 20% 20%;
-    --muted-foreground: 215 20.2% 75%;
+    --muted: 220 12% 20%;
+    --muted-foreground: 217 10% 75%;
 
     --accent: 260 30% 30%;
     --accent-foreground: 210 40% 98%;
@@ -78,26 +86,29 @@
     --destructive: 0 62.8% 40.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 220 20% 18%;
-    --input: 220 20% 18%;
+    /* Dark theme specific variables from user request */
+    --text-primary: 220 14% 96%;
+    --text-secondary: 220 10% 75%;
+    --accent: 225 100% 71%;
+    --accent-hover: 225 100% 76%;
+    --accent-active: 225 93% 64%;
+    --border-neutral: 220 14% 20%;
+    --divider: 220 12% 17%;
+    --focus-ring: rgba(110, 139, 255, 0.4);
+    --shadow: rgba(0, 0, 0, 0.5);
+
+    --border: var(--border-neutral);
+    --input: var(--border-neutral);
     --ring: 260 60% 65%;
 
-    --sidebar-background: 220 20% 10%;
+    --sidebar-background: 220 12% 10%;
     --sidebar-foreground: 260 30% 80%;
     --sidebar-primary: 260 60% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 260 30% 25%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 20% 18%;
+    --sidebar-border: 220 12% 18%;
     --sidebar-ring: 260 60% 65%;
-    
-    /* Audio player specific variables */
-    --bg-surface: 220 20% 15%;
-    --border-neutral: 220 20% 18%;
-    --text-primary: 210 40% 98%;
-    --accent-hover: 260 60% 70%;
-    --accent-active: 260 60% 60%;
-    --focus-ring: rgba(155, 135, 245, 0.4);
   }
 }
 

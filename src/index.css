@@ -43,6 +43,13 @@
     --sidebar-accent-foreground: 260 50% 55%;
     --sidebar-border: 260 30% 90%;
     --sidebar-ring: 260 80% 75%;
+
+    /* Dark theme variables */
+    --bg-main: #111216;
+    --bg-surface: #1B1C20;
+    --text-primary: #EAEAEA;
+    --text-secondary: #B5B5BE;
+    --accent: #7F8CFF;
   }
 
   .dark {

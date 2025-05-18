@@ -1,5 +1,5 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,12 +15,14 @@ const handler = async (_req: Request): Promise<Response> => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const serviceRoleKey = Deno.env.get("SERVICE_ROLE_KEY");
-    const projectRef = supabaseUrl?.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1];
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!supabaseUrl || !serviceRoleKey || !projectRef) {
+    if (!supabaseUrl || !serviceRoleKey) {
       throw new Error("Missing environment variables");
     }
+
+    // Create the admin client using service role key
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -165,35 +167,23 @@ Click the link below to verify your e-mail and start creating personalised bedti
 
 If you didn't request this, just ignore this e-mail.`;
 
-    const payload = {
+    // Use the official admin API to update the email template
+    const { data, error } = await supabase.auth.admin.updateEmailTemplate({
       template_type: "confirm_signup",
       subject: "Confirm your AI-Tale account",
       html_content: htmlContent,
       text_content: textContent,
-    };
-
-    const managementApiUrl = `https://api.supabase.com/v1/projects/${projectRef}/auth/templates/email`;
-    
-    const response = await fetch(managementApiUrl, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${serviceRoleKey}`,
-      },
-      body: JSON.stringify(payload),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`API error: ${response.status} ${JSON.stringify(errorData)}`);
+    if (error) {
+      throw new Error(`Admin API error: ${error.message}`);
     }
-
-    const data = await response.json();
 
     return new Response(
       JSON.stringify({
         success: true,
         message: "Email template updated successfully",
+        status: "template updated",
         data
       }),
       {

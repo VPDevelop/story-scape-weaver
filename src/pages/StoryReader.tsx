@@ -25,12 +25,7 @@ const StoryReader = () => {
 
   const handleImageError = () => {
     setImageLoading(false);
-    toast({
-      title: "Image failed to load",
-      description: "The story image could not be loaded.",
-      variant: "destructive",
-      duration: 3000,
-    });
+    // We'll let the ImageWithLoader component handle the error toast
   };
   
   const handleBack = () => {

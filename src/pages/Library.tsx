@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ImageWithLoader } from "@/components/ui/image-with-loader";
 
 interface Story {
   id: string;
@@ -85,10 +86,12 @@ const Library = () => {
           <Link to={`/story/${story.id}`} key={story.id}>
             <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 border-2 border-transparent hover:border-primary/20">
               <div className="aspect-[3/4] relative overflow-hidden">
-                <img 
-                  src={story.image_url || `https://source.unsplash.com/random/300x400/?${encodeURIComponent(story.title)}`} 
-                  alt={story.title} 
-                  className="object-cover w-full h-full"
+                <ImageWithLoader
+                  src={story.image_url || `https://source.unsplash.com/random/300x400/?${encodeURIComponent(story.title)}`}
+                  alt={story.title}
+                  aspectRatio={3/4}
+                  className="w-full h-full"
+                  imgClassName="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
                   <h3 className="text-white font-bold text-lg line-clamp-2">{story.title}</h3>

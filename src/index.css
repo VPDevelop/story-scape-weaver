@@ -43,6 +43,14 @@
     --sidebar-accent-foreground: 260 50% 55%;
     --sidebar-border: 260 30% 90%;
     --sidebar-ring: 260 80% 75%;
+    
+    /* Audio player specific variables */
+    --bg-surface: var(--card);
+    --border-neutral: var(--border);
+    --text-primary: var(--foreground);
+    --accent-hover: 260 80% 80%;
+    --accent-active: 260 80% 70%;
+    --focus-ring: rgba(155, 135, 245, 0.4);
   }
 
   .dark {
@@ -82,6 +90,14 @@
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 220 20% 18%;
     --sidebar-ring: 260 60% 65%;
+    
+    /* Audio player specific variables */
+    --bg-surface: 220 20% 15%;
+    --border-neutral: 220 20% 18%;
+    --text-primary: 210 40% 98%;
+    --accent-hover: 260 60% 70%;
+    --accent-active: 260 60% 60%;
+    --focus-ring: rgba(155, 135, 245, 0.4);
   }
 }
 

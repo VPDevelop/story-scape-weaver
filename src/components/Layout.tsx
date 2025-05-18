@@ -77,7 +77,7 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
               to="/library"
               className="text-sm text-muted-foreground underline-offset-4 hover:underline"
             >
-              My Stories
+              Library
             </Link>
             <Link
               to="/legal"
@@ -96,6 +96,12 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
               className="text-sm text-muted-foreground underline-offset-4 hover:underline"
             >
               Terms
+            </Link>
+            <Link
+              to="/legal/cookies"
+              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Cookies
             </Link>
           </div>
         </div>

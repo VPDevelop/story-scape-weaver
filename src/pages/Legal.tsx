@@ -24,7 +24,7 @@ const Legal = () => {
   ];
 
   return (
-    <div className="py-8 px-2 max-w-3xl mx-auto">
+    <div className="py-8 px-0 md:px-2 max-w-3xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">Legal Information</h1>
       <p className="text-center text-muted-foreground mb-8">
         Review our policies and legal documents

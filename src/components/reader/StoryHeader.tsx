@@ -16,18 +16,33 @@ const StoryHeader = ({
   onImageError, 
   imageLoading 
 }: StoryHeaderProps) => {
+  // Use a default image URL based on the story title if no imageUrl is provided
+  const imageSource = imageUrl || `https://source.unsplash.com/random/1200x800/?${encodeURIComponent(title)}`;
+  
   return (
     <>
       {/* Full-width image with reduced padding */}
       <div className="w-full h-[36vh] md:h-[45vh] relative">
-        <ImageWithLoader 
-          src={imageUrl || `https://source.unsplash.com/random/1200x800/?${encodeURIComponent(title)}`}
-          alt={title}
-          aspectRatio={16/9}
-          className="w-full h-full"
-          imgClassName="w-full h-full object-cover"
-          key={`story-image-${Date.now()}`} // Add a unique key to force render
-        />
+        {!imageLoading && (
+          <ImageWithLoader 
+            src={imageSource}
+            alt={title}
+            aspectRatio={16/9}
+            className="w-full h-full"
+            imgClassName="w-full h-full object-cover"
+            onLoad={onImageLoad}
+            onError={onImageError}
+          />
+        )}
+        
+        {imageLoading && (
+          <div className="w-full h-full flex items-center justify-center bg-muted/30">
+            <div className="flex flex-col items-center">
+              <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mb-2"></div>
+              <span className="text-sm text-muted-foreground">Generating image...</span>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Title with reduced padding */}

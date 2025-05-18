@@ -109,8 +109,8 @@ const Library = () => {
   }
   
   return (
-    <div className="py-6 px-2">
-      <h1 className="text-3xl font-bold mb-6 text-center md:text-left">Your Story Library</h1>
+    <div className="py-6 px-0 md:px-2 max-w-[95%] mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-center md:text-left px-4 md:px-0">Your Story Library</h1>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {stories.map((story) => (
           <Link to={`/story/${story.id}`} key={`story-card-${story.id}-${refreshKey}`}>

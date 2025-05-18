@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useStory } from "@/hooks/useStory";
@@ -17,6 +17,7 @@ const StoryReader = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { story, loading } = useStory(id);
+  const [refreshKey] = useState(Date.now()); // Add a refresh key that doesn't change
   
   const handleBack = () => {
     navigate('/library');
@@ -31,9 +32,9 @@ const StoryReader = () => {
   }
   
   return (
-    <div className="-mt-4 -mx-4 pb-20 overflow-hidden">
+    <div className="-mt-4 -mx-4 pb-16 overflow-hidden">
       {/* Action buttons container - positioned with reduced padding */}
-      <div className="sticky top-16 pt-2 pb-1 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
+      <div className="sticky top-16 pt-1 pb-0 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
         {/* Back button with enhanced visibility */}
         <Button 
           variant="outline" 
@@ -54,6 +55,7 @@ const StoryReader = () => {
         onImageLoad={() => {}}
         onImageError={() => {}}
         imageLoading={false}
+        key={`story-header-${story.id}-${refreshKey}`} // Add a key to force render
       />
       
       <StoryContent text={story.text} />

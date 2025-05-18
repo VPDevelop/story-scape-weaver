@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,39 +21,45 @@ interface Story {
 const Library = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(Date.now()); // Add a refresh key state
   const { toast } = useToast();
   const location = useLocation();
   
+  // Update refresh key when navigation occurs
   useEffect(() => {
-    const fetchStories = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('stories')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) {
-          throw error;
-        }
-        
-        setStories(data || []);
-      } catch (error) {
-        console.error('Error fetching stories:', error);
-        toast({
-          title: "Error loading stories",
-          description: "Please try again later or verify you're logged in.",
-          variant: "destructive",
-          duration: 3000,
-        });
-      } finally {
-        setLoading(false);
+    setRefreshKey(Date.now());
+  }, [location.key]);
+  
+  const fetchStories = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('stories')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        throw error;
       }
-    };
-    
+      
+      setStories(data || []);
+    } catch (error) {
+      console.error('Error fetching stories:', error);
+      toast({
+        title: "Error loading stories",
+        description: "Please try again later or verify you're logged in.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+  
+  useEffect(() => {
     fetchStories();
     
-    // Set up a subscription to listen for changes to stories (including deletes)
+    // Set up a subscription to listen for changes to stories
     const channel = supabase
       .channel('public:stories')
       .on('postgres_changes', {
@@ -69,7 +75,7 @@ const Library = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [toast, location.key]); // Re-fetch when navigation occurs
+  }, [fetchStories, location.key]); // Re-fetch when navigation occurs
   
   if (loading) {
     return (
@@ -110,7 +116,7 @@ const Library = () => {
                   aspectRatio={3/4}
                   className="w-full h-full"
                   imgClassName="w-full h-full object-cover"
-                  key={`story-${story.id}-${location.key || ''}`} // Add key to force re-render when location changes
+                  key={`story-${story.id}-${refreshKey}`} // Use the refreshKey to force re-render
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
                   <h3 className="text-white font-bold text-lg line-clamp-2">{story.title}</h3>

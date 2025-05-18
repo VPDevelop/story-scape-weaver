@@ -15,18 +15,8 @@ import DeleteStoryDialog from "@/components/reader/DeleteStoryDialog";
 const StoryReader = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [imageLoading, setImageLoading] = useState(true);
   const { toast } = useToast();
   const { story, loading } = useStory(id);
-  
-  const handleImageLoad = () => {
-    setImageLoading(false);
-  };
-
-  const handleImageError = () => {
-    setImageLoading(false);
-    // We'll let the ImageWithLoader component handle the error toast
-  };
   
   const handleBack = () => {
     navigate('/library');
@@ -42,8 +32,8 @@ const StoryReader = () => {
   
   return (
     <div className="-mt-4 -mx-4 pb-20 overflow-hidden">
-      {/* Action buttons container - positioned below header but above image */}
-      <div className="sticky top-16 pt-4 pb-2 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
+      {/* Action buttons container - positioned with reduced padding */}
+      <div className="sticky top-16 pt-2 pb-1 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
         {/* Back button with enhanced visibility */}
         <Button 
           variant="outline" 
@@ -61,9 +51,9 @@ const StoryReader = () => {
       <StoryHeader
         title={story.title}
         imageUrl={story.image_url}
-        onImageLoad={handleImageLoad}
-        onImageError={handleImageError}
-        imageLoading={imageLoading}
+        onImageLoad={() => {}}
+        onImageError={() => {}}
+        imageLoading={false}
       />
       
       <StoryContent text={story.text} />

@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
@@ -22,6 +21,7 @@ const Library = () => {
   const [stories, setStories] = useState<Story[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const location = useLocation();
   
   useEffect(() => {
     const fetchStories = async () => {
@@ -51,7 +51,24 @@ const Library = () => {
     };
     
     fetchStories();
-  }, [toast]);
+    
+    // Set up a subscription to listen for changes to stories (including deletes)
+    const channel = supabase
+      .channel('public:stories')
+      .on('postgres_changes', {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'stories',
+      }, (payload) => {
+        console.log('Story deleted:', payload);
+        setStories(prev => prev.filter(story => story.id !== payload.old.id));
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [toast, location.key]); // Re-fetch when navigation occurs
   
   if (loading) {
     return (

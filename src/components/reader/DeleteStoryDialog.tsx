@@ -43,7 +43,8 @@ const DeleteStoryDialog = ({ storyId, storyTitle }: DeleteStoryDialogProps) => {
         duration: 3000,
       });
       
-      navigate('/library');
+      // Ensure immediate navigation back to library
+      navigate('/library', { replace: true });
     } catch (error) {
       console.error('Error deleting story:', error);
       toast({

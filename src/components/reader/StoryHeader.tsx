@@ -18,7 +18,7 @@ const StoryHeader = ({
 }: StoryHeaderProps) => {
   return (
     <>
-      {/* Full-width image */}
+      {/* Full-width image with reduced padding */}
       <div className="w-full h-[40vh] md:h-[50vh] relative">
         <ImageWithLoader 
           src={imageUrl || `https://source.unsplash.com/random/1200x800/?${encodeURIComponent(title)}`}
@@ -26,13 +26,11 @@ const StoryHeader = ({
           aspectRatio={16/9}
           className="w-full h-full"
           imgClassName="w-full h-full object-cover"
-          onLoad={onImageLoad}
-          onError={onImageError}
         />
       </div>
       
-      {/* Title */}
-      <div className="px-6 pt-6 pb-2">
+      {/* Title with reduced padding */}
+      <div className="px-6 pt-4 pb-2">
         <h1 className="text-3xl md:text-4xl font-bold">{title}</h1>
       </div>
     </>

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -109,6 +110,7 @@ const Library = () => {
                   aspectRatio={3/4}
                   className="w-full h-full"
                   imgClassName="w-full h-full object-cover"
+                  key={`story-${story.id}-${location.key || ''}`} // Add key to force re-render when location changes
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
                   <h3 className="text-white font-bold text-lg line-clamp-2">{story.title}</h3>

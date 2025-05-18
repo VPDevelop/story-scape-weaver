@@ -14,11 +14,15 @@ const handler = async (_req: Request): Promise<Response> => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    // Get environment variables
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const projectRef = 
+      Deno.env.get("SUPABASE_PROJECT_REF") ?? 
+      Deno.env.get("PROJECT_REF") ?? 
+      Deno.env.get("SUPABASE_PROJECT_ID");
     
-    if (!supabaseUrl || !serviceRoleKey) {
-      throw new Error("Missing environment variables");
+    if (!serviceRoleKey || !projectRef) {
+      throw new Error("Missing required environment variables: SUPABASE_SERVICE_ROLE_KEY or project reference");
     }
 
     const htmlContent = `
@@ -164,18 +168,24 @@ Click the link below to verify your e-mail and start creating personalised bedti
 
 If you didn't request this, just ignore this e-mail.`;
 
-    // Send email template update directly to the auth API endpoint
-    const response = await fetch(`${supabaseUrl}/auth/v1/admin/email-templates/confirm_signup`, {
-      method: "PUT",
+    // Build the Management API URL with project reference
+    const url = `https://api.supabase.com/v1/projects/${projectRef}/auth/templates/email`;
+
+    console.log(`Making PATCH request to: ${url}`);
+
+    // Make a PATCH request to the Management API
+    const response = await fetch(url, {
+      method: "PATCH",
       headers: {
-        "Content-Type": "application/json",
         "apikey": serviceRoleKey,
-        "Authorization": `Bearer ${serviceRoleKey}`
+        "Authorization": `Bearer ${serviceRoleKey}`,
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
+        template_type: "confirm_signup",
         subject: "Confirm your AI-Tale account",
-        html_template: htmlContent,
-        text_template: textContent
+        html_content: htmlContent,
+        text_content: textContent
       })
     });
 
@@ -185,6 +195,7 @@ If you didn't request this, just ignore this e-mail.`;
     }
 
     const data = await response.json();
+    console.log("Template update response:", data);
 
     return new Response(
       JSON.stringify({

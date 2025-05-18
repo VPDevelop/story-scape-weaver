@@ -13,13 +13,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Form,
   FormControl,
   FormField,
@@ -27,6 +20,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Badge } from "@/components/ui/badge";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,8 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   childName: z.string().min(1, "Child's name is required"),
-  theme: z.string().min(1, "Theme is required"),
-  lang: z.string().min(1, "Language is required"),
+  themes: z.array(z.string()).min(1, "At least one theme is required").max(2, "Maximum 2 themes allowed"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -49,8 +42,7 @@ const NewStory = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       childName: "",
-      theme: "",
-      lang: "en",
+      themes: [],
     },
   });
   
@@ -75,12 +67,12 @@ const NewStory = () => {
       const userId = sessionData.session.user.id;
       console.log("User ID:", userId);
       
-      // Call the generateStory edge function
+      // Call the generateStory edge function with fixed English language
       const { data: storyData, error } = await supabase.functions.invoke('generateStory', {
         body: { 
           childName: data.childName, 
-          theme: data.theme, 
-          lang: data.lang, 
+          theme: data.themes.join(", "), 
+          lang: "en", // Fixed to English
           userId 
         }
       });
@@ -120,16 +112,43 @@ const NewStory = () => {
     "Adventure",
     "Animals",
     "Superheroes",
+    "Pirates",
+    "Dragons",
+    "Princesses",
+    "Robots",
+    "Magic School",
+    "Time Travel",
+    "Sports",
+    "Music",
+    "Jungle",
+    "Arctic",
+    "Desert",
+    "Circus",
   ];
   
-  const languages = [
-    { code: "en", name: "English" },
-    { code: "es", name: "Spanish" },
-    { code: "fr", name: "French" },
-    { code: "de", name: "German" },
-    { code: "zh", name: "Chinese" },
-    { code: "ja", name: "Japanese" },
-  ];
+  const toggleTheme = (theme: string) => {
+    const currentThemes = form.getValues().themes || [];
+    
+    if (currentThemes.includes(theme)) {
+      // Remove theme if already selected
+      form.setValue(
+        "themes", 
+        currentThemes.filter(t => t !== theme),
+        { shouldValidate: true }
+      );
+    } else {
+      // Add theme if not already selected and below limit
+      if (currentThemes.length < 2) {
+        form.setValue("themes", [...currentThemes, theme], { shouldValidate: true });
+      } else {
+        toast({
+          title: "Maximum themes reached",
+          description: "You can select up to 2 themes",
+          variant: "default",
+        });
+      }
+    }
+  };
   
   return (
     <div className="max-w-4xl mx-auto py-8">
@@ -143,80 +162,46 @@ const NewStory = () => {
         <CardContent className="pt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="childName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Child's Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter child's name" {...field} className="rounded-lg" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="childName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Child's Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter child's name" {...field} className="rounded-lg" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 
-                <div className="space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="theme"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Story Theme</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="rounded-lg">
-                              <SelectValue placeholder="Select a theme" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {themes.map((theme) => (
-                              <SelectItem key={theme} value={theme}>
-                                {theme}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="lang"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Language</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger className="rounded-lg">
-                              <SelectValue placeholder="Select a language" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {languages.map((language) => (
-                              <SelectItem key={language.code} value={language.code}>
-                                {language.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="themes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Story Themes (select up to 2)</FormLabel>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {themes.map((theme) => {
+                          const isSelected = field.value?.includes(theme);
+                          return (
+                            <Badge 
+                              key={theme} 
+                              variant={isSelected ? "default" : "outline"}
+                              className={`px-3 py-1 cursor-pointer text-sm hover:bg-primary/80 transition-colors ${isSelected ? 'bg-primary text-primary-foreground' : ''}`}
+                              onClick={() => toggleTheme(theme)}
+                            >
+                              {theme}
+                            </Badge>
+                          );
+                        })}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
               
               <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>

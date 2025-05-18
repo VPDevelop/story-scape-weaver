@@ -79,7 +79,7 @@ const Library = () => {
   return (
     <div className="py-6">
       <h1 className="text-3xl font-bold mb-6 text-center md:text-left">Your Story Library</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {stories.map((story) => (
           <Link to={`/story/${story.id}`} key={story.id}>
             <Card className="h-full overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 border-2 border-transparent hover:border-primary/20">

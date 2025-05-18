@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -37,6 +36,17 @@ const NewStory = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  
+  useEffect(() => {
+    // Check authentication status when component mounts
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      setIsAuthenticated(!!data.session);
+    };
+    
+    checkAuth();
+  }, []);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -48,20 +58,17 @@ const NewStory = () => {
   
   const onSubmit = async (data: FormValues) => {
     console.log("Form submitted:", data);
+    
+    // Check if user is authenticated
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      // Redirect to auth page if not authenticated
+      navigate("/auth");
+      return;
+    }
+    
     try {
       setIsSubmitting(true);
-      
-      // Check if user is authenticated
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to create a story.",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
       
       // Get user ID
       const userId = sessionData.session.user.id;
@@ -150,6 +157,17 @@ const NewStory = () => {
     }
   };
   
+  const handleSubmitOrLogin = () => {
+    // If not authenticated, redirect to login page
+    if (!isAuthenticated) {
+      navigate("/auth");
+      return;
+    }
+    
+    // Otherwise, proceed with form submission
+    form.handleSubmit(onSubmit)();
+  };
+  
   return (
     <div className="max-w-4xl mx-auto py-8">
       <Card className="shadow-md border-2 border-story-purple/20">
@@ -161,7 +179,7 @@ const NewStory = () => {
         </CardHeader>
         <CardContent className="pt-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={(e) => { e.preventDefault(); handleSubmitOrLogin(); }} className="space-y-6">
               <div className="space-y-6">
                 <FormField
                   control={form.control}
@@ -205,7 +223,7 @@ const NewStory = () => {
               </div>
               
               <Button type="submit" className="w-full mt-6" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Generate Story'}
+                {isSubmitting ? 'Creating...' : isAuthenticated ? 'Generate Story' : 'Sign In to Generate Story'}
               </Button>
             </form>
           </Form>

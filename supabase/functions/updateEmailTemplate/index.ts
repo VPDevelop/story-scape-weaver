@@ -172,7 +172,7 @@ Click the link below to verify your e-mail and start creating personalised bedti
 If you didn't request this, just ignore this e-mail.`;
 
     // Build the Management API URL with project reference
-    const url = `https://api.supabase.com/v1/projects/${projectRef}/auth/templates/email`;
+    const url = `https://api.supabase.com/v1/projects/${projectRef}/auth/email/templates`;
 
     console.log(`Making PATCH request to: ${url}`);
 
@@ -180,7 +180,7 @@ If you didn't request this, just ignore this e-mail.`;
     const response = await fetch(url, {
       method: "PATCH",
       headers: {
-        "apikey": serviceRoleKey,
+        // Make sure we format the Authorization header correctly with Bearer prefix
         "Authorization": `Bearer ${serviceRoleKey}`,
         "Content-Type": "application/json"
       },
@@ -194,6 +194,7 @@ If you didn't request this, just ignore this e-mail.`;
 
     if (!response.ok) {
       const errorText = await response.text();
+      console.error(`API error ${response.status}:`, errorText);
       throw new Error(`API error ${response.status}: ${errorText}`);
     }
 

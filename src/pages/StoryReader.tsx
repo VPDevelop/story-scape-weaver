@@ -112,11 +112,12 @@ const StoryReader = () => {
     try {
       setAudioGenerating(true);
       
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/generateAudio`, {
+      // Fix: Use the direct function URL instead of accessing protected properties
+      const response = await fetch("https://drfufywfplvjrpmqfqlz.supabase.co/functions/v1/generateAudio", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRyZnVmeXdmcGx2anJwbXFmcWx6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc0OTUzNzEsImV4cCI6MjA2MzA3MTM3MX0.A7gtD1rP2Aj2EpLn7hxRaFa-JZaKCVLkEIjAszTKrJw`
         },
         body: JSON.stringify({
           storyId: id

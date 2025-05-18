@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.1";
+import OpenAI from "https://esm.sh/openai@4.20.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -29,21 +30,42 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate a simple story based on theme
+    // Initialize OpenAI client
+    const openaiApiKey = Deno.env.get("OPENAI_API_KEY") || "";
+    const openai = new OpenAI({ apiKey: openaiApiKey });
+
+    // Generate story title
     const storyTitle = `${childName}'s ${theme} Adventure`;
     
-    // Simple story generation - in a real app, you might use an AI service here
-    let storyText = `Once upon a time, ${childName} went on an amazing ${theme} adventure. `;
-    
-    if (theme === "Space") {
-      storyText += `${childName} blasted off in a rocket ship to explore the stars. The universe was full of wonders!`;
-    } else if (theme === "Ocean") {
-      storyText += `${childName} dove deep under the sea and discovered colorful fish and hidden treasures.`;
-    } else if (theme === "Forest") {
-      storyText += `${childName} walked through the enchanted forest, talking to friendly animals and magical creatures.`;
-    } else {
-      storyText += `It was the most exciting day of ${childName}'s life, filled with wonder and joy.`;
-    }
+    // Generate story using OpenAI API
+    // gpt-3.5-turbo-0125 cost ≈ $0.0005 input / $0.0015 output per 1K tokens,
+    // ~10× cheaper than GPT-4o (≈ $0.0025 / $0.010)
+    const prompt = `Write a children's story about ${childName} going on a ${theme} adventure.`;
+    const systemInstruction = `You are a creative children's storyteller.
+Write a bedtime story in ${lang} aimed at 4-8 year olds.
+Length must be at least 900 words and no more than 1,200 words.
+Include the child's name ${childName} naturally 6-8 times.
+Keep the language simple and warm; end with a gentle moral.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo-0125",
+      messages: [
+        {
+          role: "system",
+          content: systemInstruction
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      max_tokens: 1500,
+      temperature: 0.8,
+      top_p: 0.95
+    });
+
+    // Extract the generated story text
+    const storyText = response.choices[0]?.message?.content || `Once upon a time, ${childName} went on an amazing ${theme} adventure. It was the most exciting day of ${childName}'s life, filled with wonder and joy.`;
 
     // Initially using a placeholder URL - will be updated by the image generation function
     const placeholderImageUrl = `https://source.unsplash.com/random/800x600/?${encodeURIComponent(theme)}`;

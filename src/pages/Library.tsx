@@ -109,7 +109,7 @@ const Library = () => {
   }
   
   return (
-    <div className="py-6">
+    <div className="py-6 px-2">
       <h1 className="text-3xl font-bold mb-6 text-center md:text-left">Your Story Library</h1>
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
         {stories.map((story) => (

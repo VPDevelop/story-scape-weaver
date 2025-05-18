@@ -11,6 +11,10 @@ import StoryReader from "@/pages/StoryReader";
 import NotFound from "@/pages/NotFound";
 import Auth from "@/pages/Auth";
 import Account from "@/pages/Account";
+import Legal from "@/pages/Legal";
+import TermsOfService from "@/pages/TermsOfService";
+import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import CookiePolicy from "@/pages/CookiePolicy";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function App() {
@@ -46,6 +50,10 @@ export default function App() {
             <Route path="/story/:id" element={<StoryReader />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/account" element={<Account />} />
+            <Route path="/legal" element={<Legal />} />
+            <Route path="/legal/terms" element={<TermsOfService />} />
+            <Route path="/legal/privacy" element={<PrivacyPolicy />} />
+            <Route path="/legal/cookies" element={<CookiePolicy />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>

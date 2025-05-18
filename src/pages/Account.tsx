@@ -143,7 +143,7 @@ const Account = () => {
   }
 
   return (
-    <div className="container max-w-3xl py-8">
+    <div className="py-8 px-2">
       <h1 className="text-3xl font-bold mb-6">My Account</h1>
       
       <Card className="mb-8">

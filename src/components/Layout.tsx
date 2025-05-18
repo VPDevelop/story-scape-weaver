@@ -66,7 +66,7 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
           <p className="text-center text-sm leading-loose text-muted-foreground">
             © 2025 LunaTales. All rights reserved.
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
               to="/"
               className="text-sm text-muted-foreground underline-offset-4 hover:underline"
@@ -78,6 +78,24 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
               className="text-sm text-muted-foreground underline-offset-4 hover:underline"
             >
               My Stories
+            </Link>
+            <Link
+              to="/legal"
+              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Legal
+            </Link>
+            <Link
+              to="/legal/privacy"
+              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Privacy
+            </Link>
+            <Link
+              to="/legal/terms"
+              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              Terms
             </Link>
           </div>
         </div>

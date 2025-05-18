@@ -31,8 +31,8 @@ const StoryReader = () => {
   
   return (
     <div className="-mt-4 -mx-4 pb-16 overflow-hidden">
-      {/* Action buttons container with reduced padding */}
-      <div className="sticky top-14 pt-1 pb-0 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background">
+      {/* Action buttons container with no top padding and 24px bottom margin */}
+      <div className="top-14 pb-0 px-4 flex justify-between max-w-screen-lg mx-auto z-20 bg-background mb-6">
         {/* Back button with enhanced visibility */}
         <Button 
           variant="outline" 

@@ -70,15 +70,15 @@ const DeleteStoryDialog = ({ storyId, storyTitle }: DeleteStoryDialogProps) => {
           <Trash2 className="h-5 w-5" />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="bg-surface border-border-neutral">
+      <AlertDialogContent className="bg-[hsl(var(--bg-surface-2))] border-[hsl(var(--border-neutral))] rounded-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete story</AlertDialogTitle>
+          <AlertDialogTitle className="text-[hsl(var(--text-primary))]">Delete story</AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete "{storyTitle}"? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="border-border-neutral bg-surface text-text-primary hover:bg-divider">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="border-[hsl(var(--border-neutral))] bg-[hsl(var(--bg-surface-2))] text-[hsl(var(--text-primary))] hover:bg-[hsl(var(--divider))]">Cancel</AlertDialogCancel>
           <AlertDialogAction 
             onClick={handleDelete} 
             disabled={isDeleting}

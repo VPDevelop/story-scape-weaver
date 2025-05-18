@@ -14,7 +14,7 @@ As our hero faced challenges and made new friends, valuable lessons were learned
 THE END`;
 
   return (
-    <div className="px-6 py-6 max-w-3xl mx-auto">
+    <div className="px-6 py-6 max-w-3xl mx-auto mb-6 lg:mb-8">
       <div className="prose prose-lg prose-stone dark:prose-invert mx-auto font-serif">
         {storyText.split('\n\n').map((paragraph, index) => (
           <p key={index} className="mb-6 text-xl leading-relaxed">{paragraph}</p>

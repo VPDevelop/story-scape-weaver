@@ -6,7 +6,6 @@ import Navbar from "@/components/Navbar";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import UserMenu from "@/components/UserMenu";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface LayoutProps {
   children: ReactNode;
@@ -18,7 +17,6 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -63,10 +61,7 @@ const Layout = ({ children, session, loading }: LayoutProps) => {
         {children}
       </main>
       
-      {/* Add padding at the bottom when on mobile to prevent navbar from covering footer content */}
-      {isMobile && <div className="h-16"></div>}
-      
-      <footer className="border-t py-6 relative z-0">
+      <footer className="border-t py-6">
         <div className="container flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
           <p className="text-center text-sm leading-loose text-muted-foreground">
             © 2025 LunaTales. All rights reserved.

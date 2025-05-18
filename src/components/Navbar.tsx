@@ -13,23 +13,6 @@ const Navbar = () => {
         : "text-foreground/70 hover:text-primary hover:bg-accent/30"
     }`;
 
-  if (!isMobile) {
-    return (
-      <nav>
-        <div className="flex gap-2">
-          <NavLink to="/library" className={navLinkClass}>
-            <BookOpen className="h-5 w-5" />
-            <span className="text-xs">Library</span>
-          </NavLink>
-          <NavLink to="/new" className={navLinkClass}>
-            <Book className="h-5 w-5" />
-            <span className="text-xs">New Story</span>
-          </NavLink>
-        </div>
-      </nav>
-    );
-  }
-
   return (
     <nav className="fixed bottom-0 left-0 w-full z-10 bg-background border-t">
       <div className="container mx-auto px-4 py-2">

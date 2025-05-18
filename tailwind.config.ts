@@ -20,31 +20,36 @@ export default {
 		},
 		extend: {
 			colors: {
-				border: 'hsl(var(--border))',
-				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
+				border: 'var(--border-neutral)',
+				input: 'var(--border-neutral)',
+				ring: 'var(--focus-ring)',
 				background: 'var(--bg-main)',
 				surface: 'var(--bg-surface)',
-				foreground: 'hsl(var(--foreground))',
+				'surface-2': 'var(--bg-surface-2)',
+				foreground: 'var(--text-primary)',
 				primary: {
 					DEFAULT: 'var(--accent)',
+					hover: 'var(--accent-hover)',
+					active: 'var(--accent-active)',
 					foreground: 'var(--text-primary)'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: 'var(--bg-surface-2)',
+					foreground: 'var(--text-primary)'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
 				},
 				muted: {
-					DEFAULT: 'hsl(var(--muted))',
+					DEFAULT: 'var(--bg-surface)',
 					foreground: 'var(--text-secondary)'
 				},
 				accent: {
 					DEFAULT: 'var(--accent)',
-					foreground: 'hsl(var(--accent-foreground))'
+					hover: 'var(--accent-hover)',
+					active: 'var(--accent-active)',
+					foreground: 'var(--text-primary)'
 				},
 				popover: {
 					DEFAULT: 'var(--bg-surface)',
@@ -61,8 +66,8 @@ export default {
 					'primary-foreground': 'var(--text-primary)',
 					accent: 'hsl(var(--sidebar-accent))',
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+					border: 'var(--border-neutral)',
+					ring: 'var(--focus-ring)'
 				},
 				story: {
 					purple: '#9b87f5',
@@ -104,6 +109,15 @@ export default {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'float': 'float 3s ease-in-out infinite'
+			},
+			boxShadow: {
+				'elevation': 'var(--shadow)'
+			},
+			transitionDuration: {
+				'DEFAULT': '150ms'
+			},
+			transitionTimingFunction: {
+				'DEFAULT': 'ease-in-out'
 			}
 		}
 	},

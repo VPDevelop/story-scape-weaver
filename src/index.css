@@ -45,11 +45,18 @@
     --sidebar-ring: 260 80% 75%;
 
     /* Dark theme variables */
-    --bg-main: #111216;
-    --bg-surface: #1B1C20;
-    --text-primary: #EAEAEA;
-    --text-secondary: #B5B5BE;
-    --accent: #7F8CFF;
+    --bg-main: #181A1E;
+    --bg-surface: #22252B;
+    --bg-surface-2: #2B2F36;
+    --text-primary: #F2F3F5;
+    --text-secondary: #B8BCC6;
+    --accent: #6E8BFF;
+    --accent-hover: #7C97FF;
+    --accent-active: #5F78E6;
+    --border-neutral: #2F333B;
+    --divider: #262A31;
+    --focus-ring: rgba(110, 139, 255, 0.4);
+    --shadow: rgba(0, 0, 0, 0.50);
   }
 
   .dark {
@@ -99,3 +106,4 @@
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
+

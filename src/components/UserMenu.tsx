@@ -62,7 +62,13 @@ const UserMenu = ({ userEmail }: UserMenuProps) => {
           {userEmail || "Account"}
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/account")} className="cursor-pointer">
+        <DropdownMenuItem 
+          onClick={() => {
+            navigate("/account");
+            setIsOpen(false);
+          }} 
+          className="cursor-pointer"
+        >
           <User className="mr-2 h-4 w-4" />
           <span>My Account</span>
         </DropdownMenuItem>

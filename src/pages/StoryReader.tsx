@@ -47,19 +47,19 @@ const StoryReader = () => {
   
   return (
     <div className="-mt-4 -mx-4 pb-20 overflow-hidden">
-      {/* Fixed action buttons container */}
-      <div className="fixed top-4 left-0 right-0 z-10 md:top-20 px-4 flex justify-between">
-        {/* Back button */}
+      {/* Fixed action buttons container - improved positioning and z-index */}
+      <div className="fixed top-4 left-0 right-0 z-20 px-4 flex justify-between max-w-screen-lg mx-auto">
+        {/* Back button with enhanced visibility */}
         <Button 
           variant="outline" 
           size="icon" 
           onClick={handleBack}
-          className="rounded-full bg-background/80 backdrop-blur-sm"
+          className="rounded-full bg-background/90 backdrop-blur-sm shadow-md hover:bg-accent"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-5 w-5" />
         </Button>
         
-        {/* Delete button - using the DialogTrigger from DeleteStoryDialog */}
+        {/* Delete button with enhanced visibility */}
         <DeleteStoryDialog storyId={story.id} storyTitle={story.title} />
       </div>
       

@@ -1,5 +1,5 @@
+
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,13 +16,10 @@ const handler = async (_req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
+    
     if (!supabaseUrl || !serviceRoleKey) {
       throw new Error("Missing environment variables");
     }
-
-    // Create the admin client using service role key
-    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     const htmlContent = `
 <!DOCTYPE html>
@@ -167,17 +164,27 @@ Click the link below to verify your e-mail and start creating personalised bedti
 
 If you didn't request this, just ignore this e-mail.`;
 
-    // Use the official admin API to update the email template
-    const { data, error } = await supabase.auth.admin.updateEmailTemplate({
-      template_type: "confirm_signup",
-      subject: "Confirm your AI-Tale account",
-      html_content: htmlContent,
-      text_content: textContent,
+    // Send email template update directly to the auth API endpoint
+    const response = await fetch(`${supabaseUrl}/auth/v1/admin/email-templates/confirm_signup`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "apikey": serviceRoleKey,
+        "Authorization": `Bearer ${serviceRoleKey}`
+      },
+      body: JSON.stringify({
+        subject: "Confirm your AI-Tale account",
+        html_template: htmlContent,
+        text_template: textContent
+      })
     });
 
-    if (error) {
-      throw new Error(`Admin API error: ${error.message}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API error ${response.status}: ${errorText}`);
     }
+
+    const data = await response.json();
 
     return new Response(
       JSON.stringify({

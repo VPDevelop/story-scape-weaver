@@ -29,40 +29,48 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate image using OpenAI API
-    const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
-    if (!openaiApiKey) {
-      throw new Error("OPENAI_API_KEY is not set in environment variables");
+    // Generate image using Gemini API
+    const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
+    if (!geminiApiKey) {
+      throw new Error("GEMINI_API_KEY is not set in environment variables");
     }
 
-    console.log("Generating image with prompt:", prompt);
+    console.log("Generating image with Gemini using prompt:", prompt);
     
-    const openaiResponse = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${openaiApiKey}`,
-      },
-      body: JSON.stringify({
-        model: "dall-e-2",
-        prompt: prompt,
-        n: 1,
-        size: "1024x1024",
-        response_format: "b64_json",
-      }),
-    });
+    const geminiResponse = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage?key=${geminiApiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          config: {
+            numberOfImages: 1,
+            aspectRatio: "1:1",
+            safetyFilterLevel: "BLOCK_ONLY_HIGH",
+            personGeneration: "ALLOW_ADULT"
+          }
+        }),
+      }
+    );
 
-    if (!openaiResponse.ok) {
-      const errorData = await openaiResponse.json();
-      console.error("OpenAI API error:", errorData);
-      throw new Error(`OpenAI API error: ${errorData.error?.message || "Unknown error"}`);
+    if (!geminiResponse.ok) {
+      const errorData = await geminiResponse.json();
+      console.error("Gemini API error:", errorData);
+      throw new Error(`Gemini API error: ${errorData.error?.message || "Unknown error"}`);
     }
 
-    const imageData = await openaiResponse.json();
-    console.log("Image generated successfully");
+    const imageData = await geminiResponse.json();
+    console.log("Image generated successfully with Gemini");
 
-    // Extract base64 data
-    const base64Data = imageData.data[0].b64_json;
+    // Extract base64 data from Gemini response
+    if (!imageData.generatedImages || !imageData.generatedImages[0]?.imageBytes) {
+      throw new Error("No image data received from Gemini API");
+    }
+
+    const base64Data = imageData.generatedImages[0].imageBytes;
     
     // Convert base64 to Uint8Array
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));

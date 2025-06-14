@@ -38,7 +38,7 @@ serve(async (req) => {
     console.log("Generating image with Gemini Imagen 3.0, prompt:", prompt);
     
     const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage?key=${geminiApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent:generateImage?key=${geminiApiKey}`,
       {
         method: "POST",
         headers: {

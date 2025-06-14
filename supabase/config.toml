@@ -3,8 +3,6 @@ project_id = "drfufywfplvjrpmqfqlz"
 
 [functions.generateImage]
 
-[functions.generateImageGemini]
-
 [functions.generateStory]
 
 [functions.generateAudio]

@@ -16,7 +16,7 @@ serve(async (req) => {
 
   try {
     // Get request body
-    const { childName, theme, lang, userId, useGemini = false } = await req.json();
+    const { childName, theme, lang, userId, useGemini = true } = await req.json();
 
     if (!childName || !theme || !lang || !userId) {
       return new Response(

@@ -1,7 +1,6 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.1";
-import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.21.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,59 +29,46 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Generate image using Gemini API
-    const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
-    if (!geminiApiKey) {
-      throw new Error("GEMINI_API_KEY is not set in environment variables");
+    // Generate image using OpenAI API
+    const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
+    if (!openaiApiKey) {
+      throw new Error("OPENAI_API_KEY is not set in environment variables");
     }
 
-    console.log("Generating image with Gemini using prompt:", prompt);
+    console.log("Generating image with OpenAI using prompt:", prompt);
     
-    const genAI = new GoogleGenerativeAI(geminiApiKey);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash-exp",
-      generationConfig: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "object",
-          properties: {
-            image: {
-              type: "object",
-              properties: {
-                mimeType: { type: "string" },
-                data: { type: "string" }
-              }
-            }
-          }
-        }
-      }
+    const response = await fetch("https://api.openai.com/v1/images/generations", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${openaiApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "standard",
+        response_format: "b64_json"
+      }),
     });
 
-    const result = await model.generateContent([
-      {
-        text: `Generate a child-friendly, colorful illustration based on this prompt: ${prompt}. Return the image as base64 data with mime type.`
-      }
-    ]);
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("OpenAI API error:", errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || "Unknown error"}`);
+    }
 
-    const response = await result.response;
-    const text = response.text();
+    const imageData = await response.json();
     
-    let imageData;
-    try {
-      imageData = JSON.parse(text);
-    } catch (parseError) {
-      console.error("Failed to parse Gemini response:", text);
-      throw new Error("Invalid response format from Gemini API");
+    if (!imageData.data || !imageData.data[0] || !imageData.data[0].b64_json) {
+      throw new Error("No image data received from OpenAI API");
     }
 
-    if (!imageData.image || !imageData.image.data) {
-      throw new Error("No image data received from Gemini API");
-    }
-
-    console.log("Image generated successfully with Gemini");
+    console.log("Image generated successfully with OpenAI");
 
     // Convert base64 to Uint8Array
-    const base64Data = imageData.image.data;
+    const base64Data = imageData.data[0].b64_json;
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
     // Upload to Supabase Storage

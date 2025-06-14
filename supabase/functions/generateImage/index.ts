@@ -35,40 +35,36 @@ serve(async (req) => {
       throw new Error("OPENAI_API_KEY is not set in environment variables");
     }
 
-    console.log("Generating image with OpenAI using prompt:", prompt);
+    console.log("Generating image with prompt:", prompt);
     
-    const response = await fetch("https://api.openai.com/v1/images/generations", {
+    const openaiResponse = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openaiApiKey}`,
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${openaiApiKey}`,
       },
       body: JSON.stringify({
-        model: "dall-e-3",
+        model: "dall-e-2",
         prompt: prompt,
         n: 1,
         size: "1024x1024",
-        quality: "standard",
-        response_format: "b64_json"
+        response_format: "b64_json",
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
+    if (!openaiResponse.ok) {
+      const errorData = await openaiResponse.json();
       console.error("OpenAI API error:", errorData);
       throw new Error(`OpenAI API error: ${errorData.error?.message || "Unknown error"}`);
     }
 
-    const imageData = await response.json();
-    
-    if (!imageData.data || !imageData.data[0] || !imageData.data[0].b64_json) {
-      throw new Error("No image data received from OpenAI API");
-    }
+    const imageData = await openaiResponse.json();
+    console.log("Image generated successfully");
 
-    console.log("Image generated successfully with OpenAI");
-
-    // Convert base64 to Uint8Array
+    // Extract base64 data
     const base64Data = imageData.data[0].b64_json;
+    
+    // Convert base64 to Uint8Array
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
     // Upload to Supabase Storage

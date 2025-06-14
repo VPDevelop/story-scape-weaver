@@ -16,7 +16,7 @@ serve(async (req) => {
 
   try {
     // Get request body
-    const { childName, theme, lang, userId } = await req.json();
+    const { childName, theme, lang, userId, useGemini = false } = await req.json();
 
     if (!childName || !theme || !lang || !userId) {
       return new Response(
@@ -90,8 +90,11 @@ Keep the language simple and warm; end with a gentle moral.`;
     // Trigger image generation in the background
     const imagePrompt = `A child-friendly, colorful illustration for a children's story about ${childName} having an adventure in a ${theme} setting. The image should be appropriate for children, bright, engaging, and illustrative of the theme.`;
     
-    // Call the generateImage function asynchronously
-    fetch(`${supabaseUrl}/functions/v1/generateImage`, {
+    // Choose which image generation function to call based on useGemini parameter
+    const imageFunction = useGemini ? 'generateImageGemini' : 'generateImage';
+    
+    // Call the appropriate image generation function asynchronously
+    fetch(`${supabaseUrl}/functions/v1/${imageFunction}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -101,7 +104,7 @@ Keep the language simple and warm; end with a gentle moral.`;
         storyId: data.id,
         prompt: imagePrompt
       })
-    }).catch(err => console.error("Error triggering image generation:", err));
+    }).catch(err => console.error(`Error triggering ${imageFunction}:`, err));
 
     return new Response(
       JSON.stringify(data),

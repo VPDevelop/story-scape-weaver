@@ -1,6 +1,7 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.1";
+import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.21.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,42 +38,51 @@ serve(async (req) => {
 
     console.log("Generating image with Gemini using prompt:", prompt);
     
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          config: {
-            numberOfImages: 1,
-            aspectRatio: "1:1",
-            safetyFilterLevel: "BLOCK_ONLY_HIGH",
-            personGeneration: "ALLOW_ADULT"
+    const genAI = new GoogleGenerativeAI(geminiApiKey);
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash-exp",
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "object",
+          properties: {
+            image: {
+              type: "object",
+              properties: {
+                mimeType: { type: "string" },
+                data: { type: "string" }
+              }
+            }
           }
-        }),
+        }
       }
-    );
+    });
 
-    if (!geminiResponse.ok) {
-      const errorData = await geminiResponse.json();
-      console.error("Gemini API error:", errorData);
-      throw new Error(`Gemini API error: ${errorData.error?.message || "Unknown error"}`);
+    const result = await model.generateContent([
+      {
+        text: `Generate a child-friendly, colorful illustration based on this prompt: ${prompt}. Return the image as base64 data with mime type.`
+      }
+    ]);
+
+    const response = await result.response;
+    const text = response.text();
+    
+    let imageData;
+    try {
+      imageData = JSON.parse(text);
+    } catch (parseError) {
+      console.error("Failed to parse Gemini response:", text);
+      throw new Error("Invalid response format from Gemini API");
     }
 
-    const imageData = await geminiResponse.json();
-    console.log("Image generated successfully with Gemini");
-
-    // Extract base64 data from Gemini response
-    if (!imageData.generatedImages || !imageData.generatedImages[0]?.imageBytes) {
+    if (!imageData.image || !imageData.image.data) {
       throw new Error("No image data received from Gemini API");
     }
 
-    const base64Data = imageData.generatedImages[0].imageBytes;
-    
+    console.log("Image generated successfully with Gemini");
+
     // Convert base64 to Uint8Array
+    const base64Data = imageData.image.data;
     const binaryData = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
     
     // Upload to Supabase Storage

@@ -37,47 +37,72 @@ serve(async (req) => {
 
     console.log("Generating image with Gemini using prompt:", prompt);
     
-    // Use Gemini's Imagen model for image generation
-    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage?key=${geminiApiKey}`, {
+    // Use the correct Gemini API endpoint for image generation
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:generateImage?key=${geminiApiKey}`;
+    
+    const requestBody = {
+      prompt: prompt,
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT", 
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        }
+      ],
+      generationConfig: {
+        aspectRatio: "3:4",
+        negativePrompt: "violence, scary, dark, inappropriate content"
+      }
+    };
+
+    console.log("Making request to Gemini API with body:", JSON.stringify(requestBody));
+
+    const geminiResponse = await fetch(geminiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        prompt: prompt,
-        safetySettings: [
-          {
-            category: "HARM_CATEGORY_HATE_SPEECH",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_DANGEROUS_CONTENT", 
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          },
-          {
-            category: "HARM_CATEGORY_HARASSMENT",
-            threshold: "BLOCK_MEDIUM_AND_ABOVE"
-          }
-        ],
-        generationConfig: {
-          aspectRatio: "3:4",
-          negativePrompt: "violence, scary, dark, inappropriate content"
-        }
-      }),
+      body: JSON.stringify(requestBody),
     });
 
+    console.log("Gemini response status:", geminiResponse.status);
+    
     if (!geminiResponse.ok) {
-      const errorData = await geminiResponse.json();
-      console.error("Gemini API error:", errorData);
-      throw new Error(`Gemini API error: ${errorData.error?.message || "Unknown error"}`);
+      const errorText = await geminiResponse.text();
+      console.error("Gemini API error response:", errorText);
+      throw new Error(`Gemini API error (${geminiResponse.status}): ${errorText}`);
     }
 
-    const imageData = await geminiResponse.json();
-    console.log("Image generated successfully with Gemini");
+    const responseText = await geminiResponse.text();
+    console.log("Raw Gemini response:", responseText);
+
+    let imageData;
+    try {
+      imageData = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Failed to parse JSON response:", parseError);
+      console.error("Response text was:", responseText);
+      throw new Error(`Invalid JSON response from Gemini API: ${parseError.message}`);
+    }
+
+    console.log("Parsed image data:", imageData);
+
+    // Check if the response contains the expected structure
+    if (!imageData.generatedImages || !imageData.generatedImages[0] || !imageData.generatedImages[0].imageBytes) {
+      console.error("Unexpected response structure:", imageData);
+      throw new Error("Invalid response structure from Gemini API");
+    }
 
     // Extract base64 data
     const base64Data = imageData.generatedImages[0].imageBytes;

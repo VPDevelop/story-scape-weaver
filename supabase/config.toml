@@ -6,5 +6,3 @@ project_id = "drfufywfplvjrpmqfqlz"
 [functions.generateStory]
 
 [functions.generateAudio]
-
-[functions.generateImageGemini]

@@ -87,53 +87,21 @@ Keep the language simple and warm; end with a gentle moral.`;
       throw error;
     }
 
-    // Trigger image generation in the background with Gemini as primary method
+    // Trigger image generation in the background
     const imagePrompt = `A child-friendly, colorful illustration for a children's story about ${childName} having an adventure in a ${theme} setting. The image should be appropriate for children, bright, engaging, and illustrative of the theme.`;
     
-    // Try Gemini first, fallback to OpenAI if Gemini fails
-    const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
-    
-    if (geminiApiKey) {
-      // Call the generateImageGemini function asynchronously
-      fetch(`${supabaseUrl}/functions/v1/generateImageGemini`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseServiceKey}`
-        },
-        body: JSON.stringify({
-          storyId: data.id,
-          prompt: imagePrompt
-        })
-      }).catch(err => {
-        console.error("Error with Gemini image generation, falling back to OpenAI:", err);
-        // Fallback to OpenAI image generation
-        fetch(`${supabaseUrl}/functions/v1/generateImage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabaseServiceKey}`
-          },
-          body: JSON.stringify({
-            storyId: data.id,
-            prompt: imagePrompt
-          })
-        }).catch(fallbackErr => console.error("Error with OpenAI fallback:", fallbackErr));
-      });
-    } else {
-      // No Gemini API key, use OpenAI directly
-      fetch(`${supabaseUrl}/functions/v1/generateImage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseServiceKey}`
-        },
-        body: JSON.stringify({
-          storyId: data.id,
-          prompt: imagePrompt
-        })
-      }).catch(err => console.error("Error triggering image generation:", err));
-    }
+    // Call the generateImage function asynchronously
+    fetch(`${supabaseUrl}/functions/v1/generateImage`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${supabaseServiceKey}`
+      },
+      body: JSON.stringify({
+        storyId: data.id,
+        prompt: imagePrompt
+      })
+    }).catch(err => console.error("Error triggering image generation:", err));
 
     return new Response(
       JSON.stringify(data),
